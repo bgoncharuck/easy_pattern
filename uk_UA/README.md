@@ -62,7 +62,7 @@ OperationSystem {
 class Music {...}
 class Lyrics {...}
 
-interface Song {
+class Song {
     Music music;
     Lyrics lyrics;
     
