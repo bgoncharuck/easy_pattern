@@ -24,11 +24,15 @@ int, float, String, Set, Map ...
 
 ### Поле
 
-Об'єкт що належить класу
+Об'єкт що належить інтерфейсу
 
 ### Метод
 
-Функція що належить класу
+Функція що належить інтерфейсу
+
+### Наслідування
+
+Коли нова реалізація розширює попередню
 
 ### Композиція
 
@@ -53,7 +57,22 @@ OperationSystem {
 Найпопулярніший структурний шаблон.
 
 **Фасад об'єднує декілька інтерфейсів в один.**
-> протилежний шаблон - [Спостерігач](#спостерігач)
+
+```
+class Music {...}
+class Lyrics {...}
+
+interface Song {
+    Music music;
+    Lyrics lyrics;
+    
+    play() {
+        music.start();
+        lyrics.slow();
+    }
+}
+
+```
 
 ## Адаптер
 Або "***мінімальний фасад***".
@@ -62,8 +81,54 @@ OperationSystem {
 
 ## Декоратор
 
-**Декоратор робить інтерфейс незалежним від певного методу**
-> протилежний шаблон - [Стратегія](#стратегія)
+**Відокремлення складного методу в окремий інтерфейс**
+через наслідування
+
+> схожий шаблон - [Стратегія](#стратегія)
+
+```
+interface SomeObject {
+    init();
+}
+
+class Initializable implements SomeObject {
+    SomeObject parent;
+
+    Initialize (SomeObject obj) {
+        parent= obj;
+    }
+
+    init() {
+        parent.init();
+    }
+}
+
+class Model extends Initializable {
+    Model (SomeObject obj) {
+        super(obj);
+    }
+
+    init() {
+        ...
+        super.init();
+    }
+}
+
+class Data extends Initializable {
+    Data (SomeObject obj) {
+        super(obj);
+    }
+
+    init() {
+        ...
+        super.init();
+    }
+}
+
+main {
+   algorithm=  Algorithm(Data(Model()));
+}
+```
 
 ## Композитор
 
@@ -85,20 +150,65 @@ OperationSystem {
 
 # Поведінки
 
-Поведінки означає, що це шаблон для роботи з композицією.
+Поведінки означає, що це шаблон для роботи з полями та методами певного класу.
 
 ## Стратегія
 
-Вид шаблону [міст](#міст).
-
 **Відокремлення складного методу в окремий інтерфейс**
+через композицію
+
+> схожий шаблон - [Декоратор](#декоратор)
 
 Роблячи це ви починаєте користуватися [мост](#міст)ом, бо розділюєте реалізацію самого інтерфейсу, і нового інтерфейсу, що раніше був методом.
-> протилежний шаблон - [Декоратор](#декоратор)
+
+Було:
+```
+class Algorithm {
+    Data
+    Data
+    Data
+    ...
+    calculate(data,data,data..);
+}
+```
+Стало:
+```
+interface Calculate {
+    calculate(data,data,data..);
+}
+
+class OldStrategy implements Calculate {
+    calculate(data,data,data..) {...}
+}
+
+class NewStrategy implements Calculate {
+    calculate(data,data,data..) {...}
+}
+
+class Algorithm {
+    Calculate calc= OldStrategy();
+    ...
+    Data
+    Data
+    Data
+    ...
+    calculate(data,data,data..) {
+        calc.calculate(data,data,data..);
+    }
+
+    makeFaster() {
+        calc= NewStrategy();
+    }
+}
+
+main {
+    if (user.wants()) {
+        algorithm.makeFaster();
+    }
+}
+```
 
 ## Стан
-
-Вид шаблону [міст](#міст).
 
 **Відокремлення декількох методів в окремий інтерфейс**
 
@@ -106,7 +216,66 @@ OperationSystem {
 
 ## Хранитель
 
-Вид шаблону [міст](#міст).
+**Відокремлення спільних полів декількох інтерфейсів в окремий інтерфейс**
 
-**Будь-яке відокремлення полів в окремий інтерфейс**
+Схожий на [відвудувача](#відвідувач), але відвідувач відокремлює методи.
 
+## Відвідувач
+
+**Відокремлення спільних методів декількох інтерфейсів в окремий інтерфейс**
+
+Він реалізіується таким чином:
+
+у вас є, скажімо 2+ різних класи із спільними методами
+```
+class Dog {
+    ...
+    toFeed();
+    toWash();
+}
+class Cat {
+    ...
+    toFeed();
+    toWash();
+}
+```
+Ви використовуєте ось таку махінацію
+```
+interface Care {
+    takeCare(Dog dog);
+    takeCare(Cat cat);
+}
+
+class Dog {
+    ...
+    be(Care care) {
+        care.takeCare(this);
+    }
+}
+
+class Cat {
+    ...
+    be(Care care) {
+        care.takeCare(this);
+    }
+}
+```
+І додаєте кожен метод реалізацією нашого нового інтерфейсу
+```
+Feeded implements Care {
+    takeCare(Dog dog) {...}
+    takeCare(Cat cat) {...}
+}
+Washed implements Care {
+    takeCare(Dog dog) {...}
+    takeCare(Cat cat) {...}
+}
+
+main {
+    for (pet in pets) {
+        pet.be(Feeded());
+        if (pet.isDirty)
+            pet.be(Washed());
+    }
+}
+```
