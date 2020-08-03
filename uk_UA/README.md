@@ -134,9 +134,40 @@ main {
 
 **Композитор робить композицію із власного інтерфейсу**
 
+```
+interface Widget {
+    data
+    data
+    method
+    ...
+    Widget child;
+}
+```
+
+
 ## Заступник
 
 **Заступник робить композицію із реалізації власного інтерфейсу**
+
+```
+interface UriProtocol {
+    String address;
+    Object action(String command);
+    ...
+}
+
+class Http implements UriProtocol {...}
+
+class Https implements UriProtocol {
+    UriProtocol http= Http();
+    Crypt crypto= SSL();
+
+    String get address => http.address;
+    void set address(String toSet) => http.address = toSet;
+    ...
+    Object action(String command) => http.action(crypto.decrypt(command));
+}
+```
 
 ## Пристосуванець
 
@@ -147,6 +178,40 @@ main {
 Чиста, правильна композиція.
 
 **Міст розділяє реалізацію певної композиції і самого інтерфейсу**
+
+```
+interface Enchanting {
+    enum ENCHANTING_TYPE;
+    int magnitude;
+}
+
+interface Sword {
+    int get damage;
+    int get value;
+    String get name;
+    ...
+    Enchanting enchanting;
+}
+
+class Freezing implements Enchanting {
+    enum ENCHANTING_TYPE= OFFENSIVE_ELEMENENTAL;
+    int magnitude= 42;
+}
+
+class MagicSteelSword implements Sword {
+    ...
+    // Constructor
+    MagicSteelSword(Enchanting enchanting)
+    {
+        ...
+        this.enchanting = enchanting;
+    }
+}
+
+main {
+    Sword SwordOfFreezingBlow= MagicSteelSword(Freezing());
+}
+```
 
 # Поведінки
 
